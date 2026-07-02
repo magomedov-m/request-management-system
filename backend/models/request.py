@@ -6,8 +6,9 @@ class Request(Base):
     __tablename__ = "requests"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
+    title = Column(String(120), nullable=False)
     description = Column(Text, nullable=True)
-    status = Column(String(50), default="new")
+    status = Column(String(20), default="new")
+    priority = Column(String(10), default="normal")
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
