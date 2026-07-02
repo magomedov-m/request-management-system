@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from database.connection import get_db
@@ -18,7 +19,11 @@ router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 @router.post("/", response_model=RequestOut, status_code=201)
 def create_new_request(data: RequestCreate, db: Session = Depends(get_db)):
-    return create_request(db, data)
+    try:
+        return create_request(db, data)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Ошибка при сохранении заявки")
 
 
 @router.get("/", response_model=List[RequestOut])

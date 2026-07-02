@@ -61,6 +61,7 @@ function RequestForm({ onCreated }: RequestFormProps) {
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as RequestPriority)}
+          style={{ padding: "4px 8px" }}
         >
           <option value="low">Низкий</option>
           <option value="normal">Обычный</option>
