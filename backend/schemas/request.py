@@ -72,3 +72,10 @@ class RequestOut(RequestBase):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedResponse(BaseModel):
+    items: list[RequestOut]
+    page: int
+    limit: int
+    total: int
