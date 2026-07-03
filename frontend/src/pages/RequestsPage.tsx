@@ -26,6 +26,7 @@ interface RequestsPageProps {
 function RequestsPage({ onLogout }: RequestsPageProps) {
   const [response, setResponse] = useState<PaginatedResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("");
@@ -39,6 +40,7 @@ function RequestsPage({ onLogout }: RequestsPageProps) {
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getRequests({
         ...sortParams,
@@ -49,6 +51,13 @@ function RequestsPage({ onLogout }: RequestsPageProps) {
         limit,
       });
       setResponse(data);
+    } catch (err: any) {
+      console.error("Ошибка загрузки:", err);
+      const msg =
+        err.response?.data?.detail ||
+        err.message ||
+        "Ошибка при загрузке данных";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -190,39 +199,50 @@ function RequestsPage({ onLogout }: RequestsPageProps) {
         </label>
       </div>
       {loading ? (
-        <p>Загрузка...</p>
+        <p style={{ textAlign: "center", padding: 24 }}>Загрузка...</p>
+      ) : error ? (
+        <p style={{ color: "red", textAlign: "center", padding: 24 }}>
+          {error}
+        </p>
       ) : response ? (
         <>
-          <RequestList
-            requests={response.items}
-            onDeleted={fetchRequests}
-            onStatusChanged={fetchRequests}
-          />
-          <div
-            style={{
-              marginTop: 16,
-              display: "flex",
-              justifyContent: "center",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              Назад
-            </button>
-            <span>
-              Стр. {page} из {totalPages} (всего: {response.total})
-            </span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages || totalPages === 0}
-            >
-              Вперёд
-            </button>
-          </div>
+          {response.items.length === 0 ? (
+            <p style={{ textAlign: "center", padding: 24 }}>Заявок нет</p>
+          ) : (
+            <>
+              <RequestList
+                requests={response.items}
+                onDeleted={fetchRequests}
+                onStatusChanged={fetchRequests}
+                isAdmin={true}
+              />
+              <div
+                style={{
+                  marginTop: 16,
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 8,
+                  alignItems: "center",
+                }}
+              >
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Назад
+                </button>
+                <span>
+                  Стр. {page} из {totalPages} (всего: {response.total})
+                </span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages || totalPages === 0}
+                >
+                  Вперёд
+                </button>
+              </div>
+            </>
+          )}
         </>
       ) : null}
     </div>

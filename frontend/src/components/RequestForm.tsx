@@ -46,8 +46,10 @@ function RequestForm({ onCreated }: RequestFormProps) {
       setPriority("normal");
       setErrors({});
       onCreated();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Ошибка создания:", err);
+      const msg = err.response?.data?.detail || "Ошибка при создании заявки";
+      alert(msg);
     }
   };
 

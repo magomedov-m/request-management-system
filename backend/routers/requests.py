@@ -60,7 +60,10 @@ def edit_request(request_id: int, data: RequestUpdate, db: Session = Depends(get
     req = get_request_by_id(db, request_id)
     if not req:
         raise HTTPException(status_code=404, detail="Заявка не найдена")
-    return update_request(db, request_id, data)
+    try:
+        return update_request(db, request_id, data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.delete("/{request_id}", status_code=204)

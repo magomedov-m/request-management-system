@@ -5,6 +5,7 @@ interface RequestListProps {
   requests: RequestOut[];
   onDeleted: () => void;
   onStatusChanged: () => void;
+  isAdmin: boolean;
 }
 
 const priorityLabels: Record<RequestPriority, string> = {
@@ -17,10 +18,19 @@ function RequestList({
   requests,
   onDeleted,
   onStatusChanged,
+  isAdmin,
 }: RequestListProps) {
   const handleDelete = async (id: number) => {
-    await deleteRequest(id);
-    onDeleted();
+    if (!window.confirm("Вы уверены, что хотите удалить эту заявку?")) {
+      return;
+    }
+    try {
+      await deleteRequest(id);
+      onDeleted();
+    } catch (err) {
+      console.error("Ошибка удаления:", err);
+      alert("Не удалось удалить заявку");
+    }
   };
 
   const handleStatusChange = async (
@@ -78,13 +88,15 @@ function RequestList({
               {new Date(req.created_at).toLocaleString("ru-RU")}
             </td>
             <td style={{ padding: 8 }}>
-              <button
-                onClick={() => handleDelete(req.id)}
-                style={{ cursor: "pointer", color: "red" }}
-                disabled={req.status === "done"}
-              >
-                Удалить
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => handleDelete(req.id)}
+                  style={{ cursor: "pointer", color: "red" }}
+                  disabled={req.status === "done"}
+                >
+                  Удалить
+                </button>
+              )}
             </td>
           </tr>
         ))}

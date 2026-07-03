@@ -69,6 +69,8 @@ def get_request_by_id(db: Session, request_id: int) -> Request | None:
 
 def update_request(db: Session, request_id: int, data: RequestUpdate) -> Request:
     db_request = get_request_by_id(db, request_id)
+    if db_request.status == "done":
+        raise ValueError("Нельзя изменить завершённую заявку")
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(db_request, key, value)
     db.commit()
