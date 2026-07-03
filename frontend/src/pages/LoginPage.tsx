@@ -29,7 +29,15 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "100px auto", padding: 24, border: "1px solid #ccc", borderRadius: 8 }}>
+    <div
+      style={{
+        maxWidth: 400,
+        margin: "100px auto",
+        padding: 24,
+        border: "1px solid #ccc",
+        borderRadius: 8,
+      }}
+    >
       <h2>Вход администратора</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 16 }}>
@@ -53,7 +61,11 @@ function LoginPage({ onLoginSuccess }: LoginPageProps) {
           />
         </div>
         {error && <p style={{ color: "red", marginBottom: 16 }}>{error}</p>}
-        <button type="submit" disabled={loading} style={{ padding: "8px 16px", width: "100%" }}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ padding: "8px 16px", width: "100%" }}
+        >
           {loading ? "Вход..." : "Войти"}
         </button>
       </form>

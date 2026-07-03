@@ -1,5 +1,5 @@
 import { deleteRequest, updateStatus } from "../api";
-import { RequestOut, RequestPriority } from "../types";
+import { RequestOut } from "../types";
 
 interface RequestListProps {
   requests: RequestOut[];
@@ -7,12 +7,6 @@ interface RequestListProps {
   onStatusChanged: () => void;
   isAdmin: boolean;
 }
-
-const priorityLabels: Record<RequestPriority, string> = {
-  low: "Низкий",
-  normal: "Обычный",
-  high: "Высокий",
-};
 
 function RequestList({
   requests,
@@ -83,7 +77,13 @@ function RequestList({
                 <option value="done">Выполнена</option>
               </select>
             </td>
-            <td style={{ padding: 8 }}>{priorityLabels[req.priority]}</td>
+            <td style={{ padding: 8 }}>
+              {req.priority === "low"
+                ? "Низкий"
+                : req.priority === "normal"
+                  ? "Обычный"
+                  : "Высокий"}
+            </td>
             <td style={{ padding: 8 }}>
               {new Date(req.created_at).toLocaleString("ru-RU")}
             </td>
