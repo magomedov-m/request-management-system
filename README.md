@@ -62,12 +62,12 @@ Frontend доступен на: http://localhost:5173
 ```typescript
 interface Request {
   id: number;
-  title: string;           // 3-120 символов
-  description?: string;    // до 1000 символов
+  title: string;
+  description?: string;
   status: "new" | "in_progress" | "done";
   priority: "low" | "normal" | "high";
-  created_at: string;      // ISO 8601
-  updated_at: string;      // ISO 8601
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -80,3 +80,22 @@ interface Request {
 - `search` — поиск по заголовку и описанию
 - `sort_by` — сортировка: `created_at` или `priority`
 - `order` — порядок: `asc` или `desc`
+
+---
+
+## Примечание
+
+Проект реализован в соответствии с техническим заданием. Следующие практики не были включены, так как не требовались ТЗ, но заняли бы сильно больше времени:
+
+- **Тестирование** — unit-тесты для сервисов, integration-тесты для API, E2E-тесты
+- **Миграции БД** — Alembic для версионирования схемы
+- **Конфигурация** — вынос секретов и настроек в переменные окружения
+- **Логирование** — structured logging вместо print
+- **Безопасность** — rate limiting, HTTPS, token refresh
+- **CI/CD** — автоматические тесты, линтеры, деплой
+- **Контейнеризация** — Dockerfile и docker-compose
+- **Code Quality** — ruff/black/mypy для Python, ESLint/Prettier для TypeScript
+- **Мониторинг** — health checks, метрики, трассировка
+- **UX** — toast-уведомления, skeleton loaders, адаптивный дизайн
+
+

@@ -1,23 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import RequestForm from "../components/RequestForm";
 import RequestList from "../components/RequestList";
+import FilterPanel from "../components/FilterPanel";
+import SearchBar from "../components/SearchBar";
+import Pagination from "../components/Pagination";
 import { getRequests } from "../api";
 import type { GetRequestsParams, PaginatedResponse } from "../api";
 import { RequestPriority } from "../types";
 
 const DEFAULT_PAGE_SIZE = 10;
-
-const statusLabels: Record<string, string> = {
-  new: "Новая",
-  in_progress: "В работе",
-  done: "Выполнена",
-};
-
-const priorityLabels: Record<RequestPriority, string> = {
-  low: "Низкий",
-  normal: "Обычный",
-  high: "Высокий",
-};
 
 interface RequestsPageProps {
   onLogout: () => void;
@@ -98,106 +89,46 @@ function RequestsPage({ onLogout }: RequestsPageProps) {
           fetchRequests();
         }}
       />
-      <input
-        type="text"
-        placeholder="Поиск по заголовку или описанию..."
+      <SearchBar
         value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
+        onChange={(value) => {
+          setSearch(value);
           setPage(1);
         }}
-        style={{
-          width: "100%",
-          padding: 8,
-          marginBottom: 16,
-          boxSizing: "border-box",
+      />
+      <FilterPanel
+        filterStatus={filterStatus}
+        filterPriority={filterPriority}
+        sort_by={sortParams.sort_by}
+        order={sortParams.order}
+        limit={limit}
+        onFilterStatusChange={(value) => {
+          setFilterStatus(value);
+          setPage(1);
+        }}
+        onFilterPriorityChange={(value) => {
+          setFilterPriority(value);
+          setPage(1);
+        }}
+        onSortByChange={(value) => {
+          setSortParams((p) => ({
+            ...p,
+            sort_by: value as GetRequestsParams["sort_by"],
+          }));
+          setPage(1);
+        }}
+        onOrderChange={(value) => {
+          setSortParams((p) => ({
+            ...p,
+            order: value as GetRequestsParams["order"],
+          }));
+          setPage(1);
+        }}
+        onLimitChange={(value) => {
+          setLimit(value);
+          setPage(1);
         }}
       />
-      <div
-        style={{ marginBottom: 16, display: "flex", gap: 12, flexWrap: "wrap" }}
-      >
-        <label>
-          Статус:{" "}
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">Все</option>
-            {Object.entries(statusLabels).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Приоритет:{" "}
-          <select
-            value={filterPriority}
-            onChange={(e) => {
-              setFilterPriority(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="">Все</option>
-            {Object.entries(priorityLabels).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Сортировать по:{" "}
-          <select
-            value={sortParams.sort_by}
-            onChange={(e) => {
-              setSortParams((p) => ({
-                ...p,
-                sort_by: e.target.value as GetRequestsParams["sort_by"],
-              }));
-              setPage(1);
-            }}
-          >
-            <option value="created_at">Дате создания</option>
-            <option value="priority">Приоритету</option>
-          </select>
-        </label>
-        <label>
-          Порядок:{" "}
-          <select
-            value={sortParams.order}
-            onChange={(e) => {
-              setSortParams((p) => ({
-                ...p,
-                order: e.target.value as GetRequestsParams["order"],
-              }));
-              setPage(1);
-            }}
-          >
-            <option value="desc">По убыванию</option>
-            <option value="asc">По возрастанию</option>
-          </select>
-        </label>
-        <label>
-          Показывать по:{" "}
-          <select
-            value={limit}
-            onChange={(e) => {
-              setLimit(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
-        </label>
-      </div>
       {loading ? (
         <p style={{ textAlign: "center", padding: 24 }}>Загрузка...</p>
       ) : error ? (
@@ -216,31 +147,12 @@ function RequestsPage({ onLogout }: RequestsPageProps) {
                 onStatusChanged={fetchRequests}
                 isAdmin={true}
               />
-              <div
-                style={{
-                  marginTop: 16,
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: 8,
-                  alignItems: "center",
-                }}
-              >
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  Назад
-                </button>
-                <span>
-                  Стр. {page} из {totalPages} (всего: {response.total})
-                </span>
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages || totalPages === 0}
-                >
-                  Вперёд
-                </button>
-              </div>
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                total={response.total}
+                onPageChange={setPage}
+              />
             </>
           )}
         </>

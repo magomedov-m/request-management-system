@@ -46,17 +46,14 @@ def get_all_requests(
 ) -> Tuple[list[Request], int]:
     base_query = _build_query(db, status, priority, search)
 
-    # Total count
     total = db.query(func.count()).select_from(base_query.subquery()).scalar()
 
-    # Sorting
     sort_column = getattr(Request, sort_by)
     if order == "asc":
         base_query = base_query.order_by(sort_column.asc())
     else:
         base_query = base_query.order_by(sort_column.desc())
 
-    # Pagination
     offset = (page - 1) * limit
     items = base_query.offset(offset).limit(limit).all()
 
