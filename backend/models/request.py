@@ -10,5 +10,5 @@ class Request(Base):
     description = Column(Text, nullable=True)
     status = Column(String(20), default="new")
     priority = Column(String(10), default="normal")
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, server_default=func.datetime('now', 'utc'))
+    updated_at = Column(DateTime, server_default=func.datetime('now', 'utc'), onupdate=func.datetime('now', 'utc'))
